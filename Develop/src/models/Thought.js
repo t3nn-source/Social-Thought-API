@@ -1,6 +1,7 @@
 import { Schema, Types, model, Document } from 'mongoose';
 
 
+
 const reactionSchema = new Schema({
     reactionId: {
         type: Schema.Types.ObjectId,
@@ -27,6 +28,11 @@ const reactionSchema = new Schema({
         }
     }
 ); 
+
+
+function dateFormat(date) {
+    return date.toLocaleString();
+  }
 
 const thoughtSchema = new Schema({
     thoughtText: {
