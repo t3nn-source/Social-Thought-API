@@ -66,24 +66,26 @@ export const updateUser = async (req, res) => {
 // BONUS: Remove a user's associated thoughts when deleted
 export const deleteUser = async (req, res) => {
     try {
-        const user = await User.findOneAndDelete({ _id: req.params.id });    
+        const user = await User.findOneAndDelete({ _id: req.params.id });
         if (!user) {
             res.status(404).json({ message: 'No user found with this id!' });
             return;
         }
-        await Thought.deleteMany({ username: user.username });
-        res.json({ message: 'User and associated thoughts deleted!' });
+        await Thought.deleteMany({ _id: { $in: user.thoughts } });
+        res.json({ message: 'User and associated thoughts deleted successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to delete user' });
     }
-};
+}
 // POST to add a new friend to a user's friend list
 export const addFriend = async (req, res) => {
     try {
+        const userId = req.params.id;
+        const friendId = req.params.friendId;
         const user = await User.findOneAndUpdate(
-            { _id: req.params.userId },
-            { $addToSet: { friends: req.params.friendId } },
+            { _id: userId },
+            { $addToSet: { friends: friendId } },
             { new: true }
         );
         if (!user) {
@@ -95,14 +97,16 @@ export const addFriend = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Failed to add friend' });
     }
-};
+}
 
 // DELETE to remove a friend from a user's friend list
 export const removeFriend = async (req, res) => {
     try {
+        const userId = req.params.id;
+        const friendId = req.params.friendId;
         const user = await User.findOneAndUpdate(
-            { _id: req.params.userId },
-            { $pull: { friends: req.params.friendId } },
+            { _id: userId },
+            { $pull: { friends: friendId } },
             { new: true }
         );
         if (!user) {
@@ -114,4 +118,4 @@ export const removeFriend = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Failed to remove friend' });
     }
-};
+}
